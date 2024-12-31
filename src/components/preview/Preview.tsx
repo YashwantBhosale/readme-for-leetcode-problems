@@ -40,13 +40,13 @@ const Preview: React.FC<PreviewProps> = ({ text }) => {
             const isInline = inline || !className;
             if (isInline) {
               return (
-                <span className="bg-gray-800 font-mono text-gray-200 px-1 rounded">
+                <span className="bg-gray-200 font-mono text-black px-1 rounded">
                   {children}
                 </span>
               );
             } else {
               return (
-                <pre className="bg-gray-900 text-gray-100 p-4 rounded mt-2 overflow-auto">
+                <pre className="bg-gray-900 text-gray-100 rounded mt-2 overflow-auto">
                   <code {...props} className={className}>
                     {children}
                   </code>
@@ -55,35 +55,40 @@ const Preview: React.FC<PreviewProps> = ({ text }) => {
             }
           },
           a({ children, href }) {
-            return (
-              <a href={href} className="text-blue-400 hover:underline">
-                {children}
-              </a>
-            );
-          },
-          table({ children }) {
-            return (
-              <table className="table-auto w-full border-collapse my-4">
-                {children}
-              </table>
-            );
-          },
-          tr({ children }) {
-            return <tr className="border-b">{children}</tr>;
-          },
-          th({ children }) {
-            return (
-              <th className="text-left py-2 px-4 border-b bg-gray-800 text-gray-100">
-                {children}
-              </th>
-            );
-          },
-          td({ children }) {
-            return <td className="py-2 px-4 border-b">{children}</td>;
-          },
-          br() {
-            return <br />;
-          }
+						return (
+							<a href={href} className="text-blue-500 hover:underline">
+								{children}
+							</a>
+						);
+					},
+					// Tables
+					table({ children }) {
+						return (
+							<table className="table-auto w-full border-collapse my-4">
+								{children}
+							</table>
+						);
+					},
+					// Table Rows
+					tr({ children }) {
+						return <tr className="border-b">{children}</tr>;
+					},
+					// Table Header
+					th({ children }) {
+						return (
+							<th className="text-left py-2 px-4 border-b bg-gray-200">
+								{children}
+							</th>
+						);
+					},
+					// Table Data Cells
+					td({ children }) {
+						return <td className="py-2 px-4 border-b">{children}</td>;
+					},
+					//line break
+					br() {
+						return <br />;
+					}
         }}
       >
         {adjustMdText(text)}
