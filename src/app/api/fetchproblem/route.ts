@@ -1,39 +1,75 @@
 import { NextResponse } from "next/server";
+import { Problem } from "@/types";
+import { formatData } from "@/app/utils";
 
 type ResponseData = {
-  message: string;
-  data: any;
+	message: string;
+	data: Problem;
 };
 
 export async function GET(req: Request) {
-  try {
-    const { searchParams } = new URL(req.url);
-    const title = searchParams.get("title");
+	try {
+		const { searchParams } = new URL(req.url);
+		const titleSlug = searchParams.get("title");
 
-    if (!title) {
-      return NextResponse.json(
-        { message: "Title query parameter is required", data: null },
-        { status: 400 }
-      );
-    }
+		if (!titleSlug) {
+			return NextResponse.json(
+				{ message: "Title query parameter is required", data: null },
+				{ status: 400 }
+			);
+		}
 
-    const response = await fetch(
-      "https://alfa-leetcode-api.onrender.com/select?titleSlug=" + title
-    );
-    const data = await response.json();
+		const query = `#graphql
+		query selectProblem($titleSlug: String!) {
+			question(titleSlug: $titleSlug) {
+				questionId
+				questionFrontendId
+				title
+				titleSlug
+				content
+				difficulty
+				likes
+				dislikes
+				topicTags {
+					name
+					slug
+					translatedName
+				}
+				stats
+				hints
+				status
+				note
+			}
+		}`;
 
-    const responseData: ResponseData = {
-      message: "Success",
-      data: data,
-    };
+		const response = await fetch("https://leetcode.com/graphql", {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+				Referer: "https://leetcode.com",
+			},
+			body: JSON.stringify({
+				query: query,
+				variables: {
+					titleSlug,
+				},
+			}),
+		});
 
-    return NextResponse.json(responseData);
-  } catch (err) {
-    console.error("Error:", err);
+		const rawData = await response.json();
+		console.log(rawData);
+		const responseData: ResponseData = {
+			message: "Success",
+			data: formatData(rawData.data.question),
+		};
 
-    return NextResponse.json(
-      { message: "Error fetching data", data: err },
-      { status: 500 }
-    );
-  }
+		return NextResponse.json(responseData);
+	} catch (err) {
+		console.error("Error:", err);
+
+		return NextResponse.json(
+			{ message: "Error fetching data", data: err },
+			{ status: 500 }
+		);
+	}
 }

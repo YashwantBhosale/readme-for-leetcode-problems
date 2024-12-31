@@ -3,9 +3,7 @@ import React, { useState } from "react";
 import {
 	FaBold,
 	FaItalic,
-	FaUnderline,
 	FaCog,
-	FaSave,
 	FaFileExport,
 } from "react-icons/fa";
 
@@ -15,23 +13,20 @@ interface TextEditorProps {
 }
 
 const TextEditor = ({ text, setText }: TextEditorProps) => {
-	const [isBold, setIsBold] = useState(false);
-	const [isItalic, setIsItalic] = useState(false);
-	const [isUnderline, setIsUnderline] = useState(false);
 	const [fontSize, setFontSize] = useState(16);
 	const [fontFamily, setFontFamily] = useState("sans");
 	const [showSettings, setShowSettings] = useState(false);
 
 	const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-		let newValue = e.target.value.replace(/<br \/>/g, "  \n");
+		const newValue = e.target.value.replace(/<br \/>/g, "  \n");
 		setText(newValue);
 	};
 
-	const autoResize = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-		const textarea = e.target;
-		textarea.style.height = "auto"; // Reset height before resizing
-		textarea.style.height = `${textarea.scrollHeight}px`; // Adjust height to content
-	};
+	// const autoResize = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+	// 	const textarea = e.target;
+	// 	textarea.style.height = "auto"; // Reset height before resizing
+	// 	textarea.style.height = `${textarea.scrollHeight}px`; // Adjust height to content
+	// };
 
 	const wrapSelectedText = (textarea: HTMLTextAreaElement, wrapper: string) => {
 		const { selectionStart, selectionEnd, value } = textarea;
@@ -144,7 +139,7 @@ const TextEditor = ({ text, setText }: TextEditorProps) => {
 			)}
 			<textarea
 				value={text}
-				onChange={(e: any) => {
+				onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
 					handleTextChange(e);
 					// autoResize(e);
 				}}

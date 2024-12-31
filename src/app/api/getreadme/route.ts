@@ -23,9 +23,9 @@ export async function POST(req: Request) {
 
 		turndownService.addRule("image", {
 			filter: "img",
-			replacement: (content: any, node: any) => {
-				const src = node.getAttribute("src");
-				const alt = node.getAttribute("alt") || "Image";
+			replacement: (content: string, node: Node) => {
+				const src = (node as Element).getAttribute("src");
+				const alt = (node as Element).getAttribute("alt") || "Image";
 				return `![${alt}](${src})`;
 			},
 		});
@@ -46,10 +46,12 @@ export async function POST(req: Request) {
         // remove all \\ before or after [ or ] character
         markdown = markdown.replace(/\\(\[|\])/g, "$1");
 
-		return NextResponse.json({
+		const responseData: ResponseData = {
 			message: "Success",
 			data: markdown,
-		});
+		};
+
+		return NextResponse.json(responseData);
 	} catch (e) {
 		console.error("Error:", e);
 		return NextResponse.json(

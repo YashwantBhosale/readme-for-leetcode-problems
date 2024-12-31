@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, ChangeEvent } from "react";
 import { Search, X } from "lucide-react";
+import { ProblemMetadata } from "@/types";
 
 interface SearchInputProps {
 	placeholder?: string;
@@ -38,7 +39,7 @@ const SearchInput: React.FC<SearchInputProps> = ({
 			setSearchResults([]);
 			return;
 		}
-		let match = getMatch(value);
+		const match = getMatch(value);
 		match.then((result) => {
 			setSearchResults(result);
 		});
@@ -80,7 +81,7 @@ const SearchInput: React.FC<SearchInputProps> = ({
 				)}
 				{searchResults.length > 0 && (
 					<div className="absolute top-10 w-full bg-white rounded-md border border-gray-200 shadow-lg text-black">
-						{searchResults.map((result: any) => (
+						{searchResults.map((result: ProblemMetadata) => (
 							<div
 								key={result.stat.question_id}
 								className="p-2 hover:bg-gray-100 cursor-pointer"

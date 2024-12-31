@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
+import { ProblemMetadata } from "@/types";
 
 export async function GET(req: Request) {
 	try {
@@ -18,7 +19,7 @@ export async function GET(req: Request) {
 		const fileContent = fs.readFileSync(filePath, "utf-8");
 		const raw = JSON.parse(fileContent);
 
-		const filteredProblems = raw.problems.filter((problem: any) =>
+		const filteredProblems = raw.problems.filter((problem: ProblemMetadata) =>
 			problem.stat.question__title.toLowerCase().includes(title.toLowerCase())
 		);
 
