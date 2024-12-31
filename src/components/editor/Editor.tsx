@@ -5,6 +5,7 @@ import {
 	FaItalic,
 	FaCog,
 	FaFileExport,
+	FaCopy,
 } from "react-icons/fa";
 
 interface TextEditorProps {
@@ -21,12 +22,6 @@ const TextEditor = ({ text, setText }: TextEditorProps) => {
 		const newValue = e.target.value.replace(/<br \/>/g, "  \n");
 		setText(newValue);
 	};
-
-	// const autoResize = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-	// 	const textarea = e.target;
-	// 	textarea.style.height = "auto"; // Reset height before resizing
-	// 	textarea.style.height = `${textarea.scrollHeight}px`; // Adjust height to content
-	// };
 
 	const wrapSelectedText = (textarea: HTMLTextAreaElement, wrapper: string) => {
 		const { selectionStart, selectionEnd, value } = textarea;
@@ -57,6 +52,14 @@ const TextEditor = ({ text, setText }: TextEditorProps) => {
 		const textarea = document.querySelector("textarea");
 		if (textarea) {
 			wrapSelectedText(textarea, "*");
+		}
+	};
+
+	const handleCopy = async () => {
+		try {
+			await navigator.clipboard.writeText(text);
+		} catch (err) {
+			console.error('Failed to copy text:', err);
 		}
 	};
 
@@ -94,6 +97,13 @@ const TextEditor = ({ text, setText }: TextEditorProps) => {
 					</button>
 				</div>
 				<div className="space-x-2">
+					<button
+						onClick={handleCopy}
+						className="p-2 rounded text-black hover:bg-gray-100"
+						aria-label="Copy Text"
+					>
+						<FaCopy />
+					</button>
 					<button
 						onClick={() => setShowSettings(!showSettings)}
 						className="p-2 rounded text-black hover:bg-gray-100"
@@ -139,10 +149,7 @@ const TextEditor = ({ text, setText }: TextEditorProps) => {
 			)}
 			<textarea
 				value={text}
-				onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
-					handleTextChange(e);
-					// autoResize(e);
-				}}
+				onChange={handleTextChange}
 				className={`w-full h-full max-h-[90%] py-5 resize-none outline-none border overflow-scroll px-4 rounded-lg focus:outline-none text-black`}
 				style={{
 					fontFamily: `${fontFamily}, sans-serif`,

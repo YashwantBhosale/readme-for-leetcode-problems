@@ -5,6 +5,8 @@ import remarkGfm from "remark-gfm";
 import rehypeSanitize from "rehype-sanitize";
 import rehypeHighlight from "rehype-highlight";
 import rehypeRaw from "rehype-raw";
+import 'highlight.js/styles/github.css'; // Example theme
+
 
 interface PreviewProps {
 	text: string;
@@ -12,28 +14,20 @@ interface PreviewProps {
 
 function adjustMdText(text: string) {
 	if (!text) return text;
-
-	text = text.replace(/<br \/>/g, "  \n");
-
+	text = text.replace(/<br \/>/g, "\n");
 	const lines = text.split("\n");
-	let insideCodeBlock = false; // Flag to track if we are inside a code block
-
+	let insideCodeBlock = false;
+  
 	for (let i = 0; i < lines.length; i++) {
-		const line = lines[i];
-
-		// Detect opening code block (```)
-		if (line.startsWith("```") && line.length === 3 && !insideCodeBlock) {
-			// If it's an opening code block and we haven't inserted a language yet
-			lines[i] = "```plaintext";
-			insideCodeBlock = true;
+	  const line = lines[i];
+	  if (line.trim().startsWith("```")) {
+		if (!insideCodeBlock && line.trim() === "```") {
+		  lines[i] = "```plaintext";
 		}
-		// Detect closing code block (```)
-		else if (line.startsWith("```") && line.length === 3 && insideCodeBlock) {
-			// If it's a closing code block, we stop modifying
-			insideCodeBlock = false;
-		}
+		insideCodeBlock = !insideCodeBlock;
+	  }
 	}
-
+	
 	return lines.join("\n");
 }
 
