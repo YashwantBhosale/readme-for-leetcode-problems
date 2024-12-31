@@ -41,7 +41,7 @@ export async function POST(req: Request) {
 		});
 
 		let markdown = turndownService.turndown(html);
-		markdown = markdown.replace(/\n/g, "<br />");
+		markdown = markdown.replace(/\n/g, "  <br />");
 
         // remove all \\ before or after [ or ] character
         markdown = markdown.replace(/\\(\[|\])/g, "$1");

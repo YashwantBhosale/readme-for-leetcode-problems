@@ -11,6 +11,8 @@ interface PreviewProps {
 }
 
 function adjustMdText(text: string) {
+	text = text.replace(/<br \/>/g, "  \n");
+
 	const lines = text.split("\n");
 	let insideCodeBlock = false; // Flag to track if we are inside a code block
 
@@ -34,6 +36,7 @@ function adjustMdText(text: string) {
 }
 
 const Preview: React.FC<PreviewProps> = ({ text }) => {
+	console.log(text);
 	return (
 		<div className="mt-5 mx-3 w-[50%] min-h-[500px] h-[100%] p-6 text-black bg-white rounded-lg shadow-lg">
 			<ReactMarkdown
@@ -45,7 +48,7 @@ const Preview: React.FC<PreviewProps> = ({ text }) => {
 						const isInline = inline || !className;
 						if (isInline) {
 							return (
-								<span className="bg-gray-100 text-black px-1 rounded">
+								<span className="bg-gray-200 font-mono text-black px-1 rounded">
 									{children}
 								</span>
 							);
@@ -91,6 +94,11 @@ const Preview: React.FC<PreviewProps> = ({ text }) => {
 					td({ children }) {
 						return <td className="py-2 px-4 border-b">{children}</td>;
 					},
+					//line break
+					br() {
+						return <br />;
+					}
+
 				}}
 			>
 				{adjustMdText(text)}

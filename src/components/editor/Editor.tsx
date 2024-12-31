@@ -23,7 +23,8 @@ const TextEditor = ({ text, setText }: TextEditorProps) => {
 	const [showSettings, setShowSettings] = useState(false);
 
 	const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-		setText(e.target.value);
+		let newValue = e.target.value.replace(/<br \/>/g, "  \n");
+		setText(newValue);
 	};
 
 	const autoResize = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
