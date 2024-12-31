@@ -11,6 +11,8 @@ interface PreviewProps {
 }
 
 function adjustMdText(text: string) {
+	if (!text) return text;
+
 	text = text.replace(/<br \/>/g, "  \n");
 
 	const lines = text.split("\n");
@@ -36,9 +38,8 @@ function adjustMdText(text: string) {
 }
 
 const Preview: React.FC<PreviewProps> = ({ text }) => {
-	console.log(text);
 	return (
-		<div className="mt-5 mx-3 w-[50%] min-h-[500px] h-[100%] p-6 text-black bg-white rounded-lg shadow-lg">
+		<div className="mt-5 mx-3 w-[50%] min-h-[70vh] max-h-[70vh] overflow-scroll p-6 text-black bg-white rounded-lg shadow-lg flex-1 sm:w-[90%]">
 			<ReactMarkdown
 				remarkPlugins={[remarkGfm]}
 				rehypePlugins={[rehypeSanitize, rehypeHighlight, rehypeRaw]} // Add plugins as necessary

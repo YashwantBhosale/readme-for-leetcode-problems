@@ -6,6 +6,8 @@ interface SearchInputProps {
 	placeholder?: string;
 	onSearch?: (value: string) => void;
 	className?: string;
+	searchValue: string;
+	setSearchValue: (value: string) => void;
 }
 
 const getMatch = async (query: string) => {
@@ -22,8 +24,10 @@ const SearchInput: React.FC<SearchInputProps> = ({
 	placeholder = "Search...",
 	onSearch,
 	className = "",
+	searchValue,
+	setSearchValue
 }) => {
-	const [searchValue, setSearchValue] = useState("");
+
 	const [searchResults, setSearchResults] = useState([]);
 
 	const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -38,13 +42,13 @@ const SearchInput: React.FC<SearchInputProps> = ({
 		match.then((result) => {
 			setSearchResults(result);
 		});
-		onSearch?.(value);
+		// onSearch?.(value);
 	};
 
 	const clearSearch = () => {
 		setSearchValue("");
 		setSearchResults([]);
-		onSearch?.("");
+		// onSearch?.("");
 	};
 
 	return (
@@ -53,6 +57,10 @@ const SearchInput: React.FC<SearchInputProps> = ({
 				<Search
 					className="absolute left-3 h-4 w-4 text-gray-400"
 					aria-hidden="true"
+					onClick={() => {
+						setSearchResults([]);
+						onSearch?.(searchValue);
+					}}
 				/>
 				<input
 					type="text"
@@ -76,6 +84,11 @@ const SearchInput: React.FC<SearchInputProps> = ({
 							<div
 								key={result.stat.question_id}
 								className="p-2 hover:bg-gray-100 cursor-pointer"
+								onClick={() => {
+									setSearchValue(result.stat.question__title);
+									setSearchResults([]);
+									onSearch?.(result.stat.question__title_slug);
+								}}
 							>
 								{result.stat.question__title}
 							</div>

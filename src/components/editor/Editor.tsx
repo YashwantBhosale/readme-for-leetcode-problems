@@ -75,12 +75,12 @@ const TextEditor = ({ text, setText }: TextEditorProps) => {
 		const url = URL.createObjectURL(blob);
 		const a = document.createElement("a");
 		a.href = url;
-		a.download = "exported-text.txt";
+		a.download = "README.md";
 		a.click();
 	};
 
 	return (
-		<div className="w-[50%] mx-5 min-h-[500px] h-full mt-5 bg-white rounded-lg shadow-lg min-w-[300px] pb-0">
+		<div className="w-[50%] mx-5 min-h-[70vh] max-h-[70vh] px-2 my-5 overflow-hidden bg-white rounded-lg shadow-lg min-w-[300px] pb-3 flex-1 sm:w-[90%]">
 			<div className="my-2 flex items-center justify-between">
 				<div className="space-x-2">
 					<button
@@ -146,9 +146,9 @@ const TextEditor = ({ text, setText }: TextEditorProps) => {
 				value={text}
 				onChange={(e: any) => {
 					handleTextChange(e);
-					autoResize(e);
+					// autoResize(e);
 				}}
-				className={`w-full h-full resize-none outline-none border-none overflow-hidden p-4 rounded-lg focus:outline-none text-black`}
+				className={`w-full h-full max-h-[90%] py-5 resize-none outline-none border overflow-scroll px-4 rounded-lg focus:outline-none text-black`}
 				style={{
 					fontFamily: `${fontFamily}, sans-serif`,
 					fontSize: `${fontSize}px`,
