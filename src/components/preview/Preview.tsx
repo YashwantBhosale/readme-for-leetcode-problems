@@ -59,10 +59,14 @@ const Preview: React.FC<PreviewProps> = ({ text }) => {
 							);
 						}
 					},
-                    // links
-                    a({children, href}) {
-                        return <a href={href} className="text-blue-500 hover:underline">{children}</a>
-                    },
+					// links
+					a({ children, href }) {
+						return (
+							<a href={href} className="text-blue-500 hover:underline">
+								{children}
+							</a>
+						);
+					},
 					// Tables
 					table({ children }) {
 						return (
