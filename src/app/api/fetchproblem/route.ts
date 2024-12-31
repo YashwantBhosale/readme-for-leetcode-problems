@@ -18,7 +18,7 @@ export async function GET(req: Request) {
     }
 
     const response = await fetch(
-      "http://localhost:3000/select?titleSlug=" + title
+      "https://alfa-leetcode-api.onrender.com/select?titleSlug=" + title
     );
     const data = await response.json();
 
