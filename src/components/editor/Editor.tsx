@@ -10,9 +10,10 @@ import {
 interface TextEditorProps {
 	text: string;
 	setText: (text: string) => void;
+	loading?: boolean;
 }
 
-const TextEditor = ({ text, setText }: TextEditorProps) => {
+const TextEditor = ({ text, setText, loading }: TextEditorProps) => {
 	const [fontSize, setFontSize] = useState(16);
 	const [fontFamily, setFontFamily] = useState("sans");
 	const [showSettings, setShowSettings] = useState(false);
@@ -138,7 +139,8 @@ const TextEditor = ({ text, setText }: TextEditorProps) => {
 				</div>
 			)}
 			<textarea
-				value={text}
+				disabled={loading}
+				value={loading ? "Loading..." : text}
 				onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
 					handleTextChange(e);
 					// autoResize(e);

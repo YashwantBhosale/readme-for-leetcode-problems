@@ -79,19 +79,19 @@ const SearchInput: React.FC<SearchInputProps> = ({
 						<X className="h-4 w-4" />
 					</button>
 				)}
-				{searchResults.length > 0 && (
+				{searchResults?.length > 0 && (
 					<div className="absolute top-10 w-full bg-white rounded-md border border-gray-200 shadow-lg text-black">
 						{searchResults.map((result: ProblemMetadata) => (
 							<div
-								key={result.stat.question_id}
+								key={result.questionFrontendId}
 								className="p-2 hover:bg-gray-100 cursor-pointer"
 								onClick={() => {
-									setSearchValue(result.stat.question__title);
+									setSearchValue(result.title);
 									setSearchResults([]);
-									onSearch?.(result.stat.question__title_slug);
+									onSearch?.(result.titleSlug);
 								}}
 							>
-								{result.stat.question__title}
+								{result.title}
 							</div>
 						))}
 					</div>

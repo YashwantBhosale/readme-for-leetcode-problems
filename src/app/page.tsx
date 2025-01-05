@@ -7,10 +7,12 @@ import { fetchProblem, fetchReadme } from "./utils";
 
 export default function Home() {
 	const [text, setText] = useState("");
+	const [isLoading, setIsLoading] = useState(false);
 	const [searchValue, setSearchValue] = useState("");
 
 	async function onSearch(value: string) {
 		try {
+			setIsLoading(true);
 			const data = await fetchProblem(value);
 			const html = data.data.question;
 			const readme = await fetchReadme(html);
@@ -25,6 +27,8 @@ export default function Home() {
 			setText(finalText);
 		} catch (e) {
 			console.error("Error:", e);
+		}finally {
+			setIsLoading(false);
 		}
 	}
 
@@ -42,7 +46,7 @@ export default function Home() {
 				className="w-full max-w-md mt-10 flex-wrap sm:w-[90%]"
 			/>
 			<div className="mt-10 w-full h-full flex sm:flex-col sm:items-center">
-				<TextEditor text={text} setText={setText} />
+				<TextEditor text={text} setText={setText} loading={isLoading}/>
 				<Preview text={text} />
 			</div>
 		</div>

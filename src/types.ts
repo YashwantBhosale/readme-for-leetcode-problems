@@ -51,7 +51,57 @@ export type Problem = {
     dislikes: number;
 };
 
+/*
+
+          "acRate": 67.2991846733209,
+          "difficulty": "Medium",
+          "freqBar": null,
+          "questionFrontendId": "1029",
+          "isFavor": false,
+          "isPaidOnly": false,
+          "status": null,
+          "title": "Two City Scheduling",
+          "titleSlug": "two-city-scheduling",
+          "topicTags": [
+            {
+              "name": "Array",
+              "id": "VG9waWNUYWdOb2RlOjU=",
+              "slug": "array"
+            },
+            {
+              "name": "Greedy",
+              "id": "VG9waWNUYWdOb2RlOjE3",
+              "slug": "greedy"
+            },
+            {
+              "name": "Sorting",
+              "id": "VG9waWNUYWdOb2RlOjYxMDQ5",
+              "slug": "sorting"
+            }
+          ],
+          "hasSolution": true,
+          "hasVideoSolution": false
+*/
+
 export type ProblemMetadata = {
+    acRate: number;
+    difficulty: string;
+    questionFrontendId: string;
+    isFavor: boolean;
+    isPaidOnly: boolean;
+    title: string;
+    titleSlug: string;
+    topicTags: Array<{
+        name: string;
+        id: string;
+        slug: string;
+    }>;
+    hasSolution: boolean;
+    hasVideoSolution: boolean;
+};
+
+
+export type ProblemJSONMetadata = {
     stat: {
         question_id: number;
         question__article__live: string | null;
