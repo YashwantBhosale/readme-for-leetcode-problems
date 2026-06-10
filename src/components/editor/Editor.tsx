@@ -1,168 +1,131 @@
 "use client";
 import React, { useState } from "react";
-import {
-	FaBold,
-	FaItalic,
-	FaCog,
-	FaFileExport,
-	FaCopy,
-} from "react-icons/fa";
+import { Bold, Italic, Copy, Download, Settings2, Check } from "lucide-react";
 
 interface TextEditorProps {
-	text: string;
-	setText: (text: string) => void;
-	loading?: boolean;
+  text: string;
+  setText: (text: string) => void;
+  loading?: boolean;
 }
 
+const FONT_FAMILIES = [
+  { value: "mono", label: "Mono" },
+  { value: "sans-serif", label: "Sans" },
+  { value: "serif", label: "Serif" },
+];
+
 const TextEditor = ({ text, setText, loading }: TextEditorProps) => {
-	const [fontSize, setFontSize] = useState(16);
-	const [fontFamily, setFontFamily] = useState("sans");
-	const [showSettings, setShowSettings] = useState(false);
+  const [fontSize, setFontSize] = useState(14);
+  const [fontFamily, setFontFamily] = useState("mono");
+  const [showSettings, setShowSettings] = useState(false);
+  const [copied, setCopied] = useState(false);
 
-	const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-		const newValue = e.target.value.replace(/<br \/>/g, "  \n");
-		setText(newValue);
-	};
+  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setText(e.target.value.replace(/<br \/>/g, "  \n"));
+  };
 
-	const wrapSelectedText = (textarea: HTMLTextAreaElement, wrapper: string) => {
-		const { selectionStart, selectionEnd, value } = textarea;
-		const selectedText = value.slice(selectionStart, selectionEnd);
-		const before = value.slice(0, selectionStart);
-		const after = value.slice(selectionEnd);
+  const wrapSelection = (wrapper: string) => {
+    const ta = document.querySelector<HTMLTextAreaElement>(".editor-textarea");
+    if (!ta) return;
+    const { selectionStart: s, selectionEnd: e, value } = ta;
+    const wrapped = `${wrapper}${value.slice(s, e)}${wrapper}`;
+    setText(value.slice(0, s) + wrapped + value.slice(e));
+    setTimeout(() => {
+      ta.focus();
+      ta.setSelectionRange(s + wrapper.length, e + wrapper.length);
+    }, 0);
+  };
 
-		const wrappedText = `${wrapper}${selectedText}${wrapper}`;
-		setText(before + wrappedText + after);
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1800);
+    } catch {}
+  };
 
-		setTimeout(() => {
-			textarea.focus();
-			textarea.setSelectionRange(
-				selectionStart + wrapper.length,
-				selectionEnd + wrapper.length
-			);
-		}, 0);
-	};
+  const handleExport = () => {
+    const blob = new Blob([text], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "README.md";
+    a.click();
+    URL.revokeObjectURL(url);
+  };
 
-	const toggleBold = () => {
-		const textarea = document.querySelector("textarea");
-		if (textarea) {
-			wrapSelectedText(textarea, "**");
-		}
-	};
+  const resolvedFont =
+    fontFamily === "mono"
+      ? "var(--font-geist-mono), monospace"
+      : fontFamily === "serif"
+      ? "Georgia, serif"
+      : "var(--font-geist-sans), sans-serif";
 
-	const toggleItalic = () => {
-		const textarea = document.querySelector("textarea");
-		if (textarea) {
-			wrapSelectedText(textarea, "*");
-		}
-	};
+  return (
+    <div className="panel">
+      <div className="editor-toolbar">
+        <div className="toolbar-group">
+          <button onClick={() => wrapSelection("**")} className="toolbar-btn" title="Bold" aria-label="Bold">
+            <Bold size={14} />
+          </button>
+          <button onClick={() => wrapSelection("*")} className="toolbar-btn" title="Italic" aria-label="Italic">
+            <Italic size={14} />
+          </button>
+        </div>
+        <div className="toolbar-group">
+          <button onClick={handleCopy} className="toolbar-btn" title="Copy markdown" aria-label="Copy">
+            {copied ? <Check size={14} style={{ color: "var(--accent)" }} /> : <Copy size={14} />}
+          </button>
+          <button
+            onClick={() => setShowSettings(!showSettings)}
+            className="toolbar-btn"
+            title="Editor settings"
+            aria-label="Settings"
+            style={showSettings ? { background: "var(--surface-2)", color: "var(--ink)" } : {}}
+          >
+            <Settings2 size={14} />
+          </button>
+          <button onClick={handleExport} className="toolbar-btn" title="Download README.md" aria-label="Export">
+            <Download size={14} />
+          </button>
+        </div>
+      </div>
 
-	const handleCopy = async () => {
-		try {
-			await navigator.clipboard.writeText(text);
-		} catch (err) {
-			console.error('Failed to copy text:', err);
-		}
-	};
+      {showSettings && (
+        <div className="editor-settings-panel">
+          <label>
+            Size
+            <input
+              type="number"
+              value={fontSize}
+              min={10}
+              max={24}
+              onChange={(e) => setFontSize(parseInt(e.target.value) || 14)}
+              style={{ width: 56 }}
+            />
+          </label>
+          <label>
+            Font
+            <select value={fontFamily} onChange={(e) => setFontFamily(e.target.value)}>
+              {FONT_FAMILIES.map((f) => (
+                <option key={f.value} value={f.value}>{f.label}</option>
+              ))}
+            </select>
+          </label>
+        </div>
+      )}
 
-	const handleFontSizeChange = (e: React.ChangeEvent<HTMLInputElement>) =>
-		setFontSize(parseInt(e.target.value));
-	const handleFontFamilyChange = (e: React.ChangeEvent<HTMLSelectElement>) =>
-		setFontFamily(e.target.value);
-
-	const handleExport = () => {
-		const blob = new Blob([text], { type: "text/plain" });
-		const url = URL.createObjectURL(blob);
-		const a = document.createElement("a");
-		a.href = url;
-		a.download = "README.md";
-		a.click();
-	};
-
-	return (
-		<div className="w-[50%] mx-5 min-h-[70vh] max-h-[70vh] px-2 my-5 overflow-hidden bg-white rounded-lg shadow-lg min-w-[300px] pb-3 flex-1 sm:w-[90%]">
-			<div className="my-2 flex items-center justify-between">
-				<div className="space-x-2">
-					<button
-						onClick={toggleBold}
-						className={`p-2 rounded text-black hover:bg-gray-100`}
-						aria-label="Toggle Bold"
-					>
-						<FaBold />
-					</button>
-					<button
-						onClick={toggleItalic}
-						className={`p-2 rounded text-black hover:bg-gray-100`}
-						aria-label="Toggle Italic"
-					>
-						<FaItalic />
-					</button>
-				</div>
-				<div className="space-x-2">
-					<button
-						onClick={handleCopy}
-						className="p-2 rounded text-black hover:bg-gray-100"
-						aria-label="Copy Text"
-					>
-						<FaCopy />
-					</button>
-					<button
-						onClick={() => setShowSettings(!showSettings)}
-						className="p-2 rounded text-black hover:bg-gray-100"
-						aria-label="Settings"
-					>
-						<FaCog />
-					</button>
-					<button
-						onClick={handleExport}
-						className="p-2 rounded text-black hover:bg-gray-100"
-						aria-label="Export"
-					>
-						<FaFileExport />
-					</button>
-				</div>
-			</div>
-			{showSettings && (
-				<div className="mb-4 p-4 bg-gray-100 rounded text-black">
-					<div className="flex items-center space-x-4">
-						<label className="flex items-center">
-							Font Size:
-							<input
-								type="number"
-								value={fontSize}
-								onChange={handleFontSizeChange}
-								className="ml-2 p-1 w-16 rounded border"
-							/>
-						</label>
-						<label className="flex items-center">
-							Font Family:
-							<select
-								value={fontFamily}
-								onChange={handleFontFamilyChange}
-								className="ml-2 p-1 rounded border"
-							>
-								<option value="sans">Sans-serif</option>
-								<option value="serif">Serif</option>
-								<option value="mono">Monospace</option>
-							</select>
-						</label>
-					</div>
-				</div>
-			)}
-			<textarea
-				disabled={loading}
-				value={loading ? "Loading..." : text}
-				onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
-					handleTextChange(e);
-					// autoResize(e);
-				}}
-				className={`w-full h-full max-h-[90%] py-5 resize-none outline-none border overflow-scroll px-4 rounded-lg focus:outline-none text-black`}
-				style={{
-					fontFamily: `${fontFamily}, sans-serif`,
-					fontSize: `${fontSize}px`,
-				}}
-			></textarea>
-		</div>
-	);
+      <textarea
+        className={`editor-textarea${loading ? " loading-shimmer" : ""}`}
+        disabled={loading}
+        value={loading ? "Loading…" : text}
+        onChange={handleChange}
+        placeholder="Search a problem above to generate its README…"
+        spellCheck={false}
+        style={{ fontFamily: resolvedFont, fontSize }}
+      />
+    </div>
+  );
 };
 
 export default TextEditor;

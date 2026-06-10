@@ -1,104 +1,101 @@
 "use client";
-import React, { useState, ChangeEvent } from "react";
+import React, { useState, ChangeEvent, KeyboardEvent } from "react";
 import { Search, X } from "lucide-react";
 import { ProblemMetadata } from "@/types";
 
 interface SearchInputProps {
-	placeholder?: string;
-	onSearch?: (value: string) => void;
-	className?: string;
-	searchValue: string;
-	setSearchValue: (value: string) => void;
+  placeholder?: string;
+  onSearch?: (value: string) => void;
+  searchValue: string;
+  setSearchValue: (value: string) => void;
 }
 
 const getMatch = async (query: string) => {
-	try {
-		const response = await fetch(`/api/getmatchresults?title=${query}`);
-		const data = await response.json();
-		return data.data;
-	} catch (e) {
-		console.error("Error:", e);
-	}
+  try {
+    const res = await fetch(`/api/getmatchresults?title=${query}`);
+    const data = await res.json();
+    return data.data;
+  } catch (e) {
+    console.error("Error:", e);
+    return [];
+  }
 };
 
 const SearchInput: React.FC<SearchInputProps> = ({
-	placeholder = "Search...",
-	onSearch,
-	className = "",
-	searchValue,
-	setSearchValue
+  placeholder = "Search problems…",
+  onSearch,
+  searchValue,
+  setSearchValue,
 }) => {
+  const [results, setResults] = useState<ProblemMetadata[]>([]);
 
-	const [searchResults, setSearchResults] = useState([]);
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchValue(value);
+    if (value.length < 3) { setResults([]); return; }
+    getMatch(value).then((r) => setResults(r ?? []));
+  };
 
-	const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-		const value = e.target.value;
-		setSearchValue(value);
+  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      setResults([]);
+      onSearch?.(searchValue);
+    }
+  };
 
-		if(value.length < 3) {
-			setSearchResults([]);
-			return;
-		}
-		const match = getMatch(value);
-		match.then((result) => {
-			setSearchResults(result);
-		});
-		// onSearch?.(value);
-	};
+  const clear = () => { setSearchValue(""); setResults([]); };
 
-	const clearSearch = () => {
-		setSearchValue("");
-		setSearchResults([]);
-		// onSearch?.("");
-	};
+  const pick = (result: ProblemMetadata) => {
+    setSearchValue(result.title);
+    setResults([]);
+    onSearch?.(result.titleSlug);
+  };
 
-	return (
-		<div className={`relative ${className}`}>
-			<div className="relative flex items-center">
-				<Search
-					className="absolute left-3 h-4 w-4 text-gray-400"
-					aria-hidden="true"
-					onClick={() => {
-						setSearchResults([]);
-						onSearch?.(searchValue);
-					}}
-				/>
-				<input
-					type="text"
-					value={searchValue}
-					onChange={handleChange}
-					placeholder={placeholder}
-					className="h-10 w-full rounded-md border border-gray-200 bg-white pl-10 pr-8 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 text-black"
-				/>
-				{searchValue && (
-					<button
-						onClick={clearSearch}
-						className="absolute right-2 p-1 text-gray-400 hover:text-gray-600"
-						aria-label="Clear search"
-					>
-						<X className="h-4 w-4" />
-					</button>
-				)}
-				{searchResults?.length > 0 && (
-					<div className="absolute top-10 w-full bg-white rounded-md border border-gray-200 shadow-lg text-black">
-						{searchResults.map((result: ProblemMetadata) => (
-							<div
-								key={result.questionFrontendId}
-								className="p-2 hover:bg-gray-100 cursor-pointer"
-								onClick={() => {
-									setSearchValue(result.title);
-									setSearchResults([]);
-									onSearch?.(result.titleSlug);
-								}}
-							>
-								{result.title}
-							</div>
-						))}
-					</div>
-				)}
-			</div>
-		</div>
-	);
+  return (
+    <div className="search-wrap">
+      <div className="search-input-row">
+        <Search
+          className="search-icon"
+          size={16}
+          aria-hidden="true"
+          style={{ cursor: "pointer", pointerEvents: "auto" }}
+          onClick={() => { setResults([]); onSearch?.(searchValue); }}
+        />
+        <input
+          type="text"
+          value={searchValue}
+          onChange={handleChange}
+          onKeyDown={handleKeyDown}
+          placeholder={placeholder}
+          className="search-input"
+          aria-label="Search LeetCode problems"
+          autoComplete="off"
+        />
+        {searchValue && (
+          <button onClick={clear} className="search-clear-btn" aria-label="Clear search">
+            <X size={14} />
+          </button>
+        )}
+      </div>
+
+      {results.length > 0 && (
+        <div className="search-dropdown">
+          {results.map((r) => (
+            <div
+              key={r.questionFrontendId}
+              className="search-result-item"
+              onClick={() => pick(r)}
+            >
+              <span style={{ color: "var(--muted)", marginRight: "0.5em", fontSize: "0.8em" }}>
+                {r.questionFrontendId}.
+              </span>
+              {r.title}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
 };
 
 export default SearchInput;
