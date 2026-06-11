@@ -11,6 +11,7 @@ export default function Home() {
   const [text, setText] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [searchValue, setSearchValue] = useState("");
+  const [activeTab, setActiveTab] = useState<"editor" | "preview">("editor");
 
   async function onSearch(value: string) {
     try {
@@ -24,6 +25,7 @@ export default function Home() {
       }`;
 
       setText(finalText);
+      setActiveTab("preview");
     } catch (e) {
       console.error("Error:", e);
     } finally {
@@ -49,9 +51,32 @@ export default function Home() {
           onSearch={onSearch}
         />
 
+        <div className="mobile-tabs" role="tablist" aria-label="Panel view">
+          <button
+            role="tab"
+            aria-selected={activeTab === "editor"}
+            className={`tab-btn${activeTab === "editor" ? " tab-btn--active" : ""}`}
+            onClick={() => setActiveTab("editor")}
+          >
+            Editor
+          </button>
+          <button
+            role="tab"
+            aria-selected={activeTab === "preview"}
+            className={`tab-btn${activeTab === "preview" ? " tab-btn--active" : ""}`}
+            onClick={() => setActiveTab("preview")}
+          >
+            Preview
+          </button>
+        </div>
+
         <div className="panels-row">
-          <TextEditor text={text} setText={setText} loading={isLoading} />
-          <Preview text={text} />
+          <div className={`panel-col${activeTab !== "editor" ? " panel-col--hidden-sm" : ""}`}>
+            <TextEditor text={text} setText={setText} loading={isLoading} />
+          </div>
+          <div className={`panel-col${activeTab !== "preview" ? " panel-col--hidden-sm" : ""}`}>
+            <Preview text={text} />
+          </div>
         </div>
       </main>
 
